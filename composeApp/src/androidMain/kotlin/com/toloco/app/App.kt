@@ -1,48 +1,37 @@
 package com.toloco.app
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.resources.painterResource
-
-import tolocoapp.composeapp.generated.resources.Res
-import tolocoapp.composeapp.generated.resources.compose_multiplatform
+import kotlinx.coroutines.launch
 
 @Composable
-@Preview
 fun App() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Hello ToLoco!", style = MaterialTheme.typography.displayLarge)
+        // Scope to run async network calls
+        val scope = rememberCoroutineScope()
+        var statusText by remember { mutableStateOf("Ready to fetch...") }
+
+        Column(Modifier.fillMaxSize()) {
+            Text(text = statusText)
+
+            Button(onClick = {
+                scope.launch {
+                    try {
+                        statusText = "Fetching..."
+                        // Using the coordinates of your Backend Test
+                        val reminders = ToLocoClient.getNearbyReminders(19.0760, 72.8777, 100.0)
+                        statusText = "Success! Found: ${reminders.size} items"
+                    } catch (e: Exception) {
+                        statusText = "Error: ${e.message}"
+                    }
                 }
+            }) {
+                Text("Test Connection")
             }
         }
     }

@@ -6,13 +6,11 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("plugin.serialization") version "1.9.21"
 }
 
 kotlin {
     androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
     }
     
     sourceSets {
@@ -75,4 +73,3 @@ android {
 dependencies {
     debugImplementation(libs.compose.uiTooling)
 }
-
