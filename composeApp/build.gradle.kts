@@ -18,6 +18,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
             implementation("io.ktor:ktor-client-okhttp:2.3.7")
+            implementation("org.osmdroid:osmdroid-android:6.1.18")
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
