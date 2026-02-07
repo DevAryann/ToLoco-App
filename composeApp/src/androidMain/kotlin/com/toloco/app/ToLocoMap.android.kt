@@ -6,28 +6,41 @@ import androidx.compose.ui.viewinterop.AndroidView
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker // Import this
 
 @Composable
-actual fun ToLocoMap(
+fun ToLocoMap(
     modifier: Modifier,
     latitude: Double,
-    longitude: Double
+    longitude: Double,
+    reminders: List<Reminder>
 ) {
-    // AndroidView allows us to use classic Android Views (like MapView) inside Compose
     AndroidView(
         factory = { context ->
             MapView(context).apply {
-                // 1. Set the Map Source (Mapnik is the standard OSM look)
                 setTileSource(TileSourceFactory.MAPNIK)
-
-                // 2. Enable Multi-touch controls (zooming with fingers)
                 setMultiTouchControls(true)
-
-                // 3. Set the starting position
                 controller.setZoom(15.0)
-                val startPoint = GeoPoint(latitude, longitude)
-                controller.setCenter(startPoint)
+                controller.setCenter(GeoPoint(latitude, longitude))
             }
+        },
+        update = { mapView ->
+            // This block runs every time 'reminders' changes
+
+            // 1. Clear old markers so we don't get duplicates
+            mapView.overlays.clear()
+
+            // 2. Add a marker for each reminder
+            reminders.forEach { reminder ->
+                val marker = Marker(mapView)
+                marker.position = GeoPoint(reminder.latitude, reminder.longitude)
+                marker.title = reminder.itemName // Shows "Buy Milk" when clicked
+                marker.snippet = reminder.shopName // Shows "D-Mart"
+                mapView.overlays.add(marker)
+            }
+
+            // 3. Refresh the map to show changes
+            mapView.invalidate()
         },
         modifier = modifier
     )
